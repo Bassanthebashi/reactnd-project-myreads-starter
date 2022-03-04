@@ -23,7 +23,7 @@ const Search = (props) => {
 
                 </div>
             </div>
-            <ShelfOfSearch searchedBooks={props.searchedBooks} changeShelf={props.changeShelf}/>
+            <ShelfOfSearch searchedBooks={props.searchedBooks} changeShelf={props.changeShelf} loadedSearch={props.loadedSearch}/>
         </div>
 
     )

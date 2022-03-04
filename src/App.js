@@ -15,7 +15,8 @@ class BooksApp extends React.Component {
     showSearchPage: false,
     books:[],
     search:'',
-    searchedBooks:[]
+    searchedBooks:[],
+    loadedSearch:false
   }
 getSearchedBook=async (event)=>{
   await this.setState({
@@ -26,9 +27,28 @@ getSearchedBook=async (event)=>{
 }
 getSearchedBooks=async(search)=>{
   await BooksAPI.search(search).then((response)=>{
-    this.setState({searchedBooks:response})
+    if(response && !response.error){
+      this.setState({
+        searchedBooks:response.map((searchedBook)=>{
+          this.state.books.forEach((book)=>{
+            if(searchedBook.id===book.id){
+              searchedBook.shelf=book.shelf;
+            }
+          })
+          return searchedBook;
+        }),
+        loadedSearch:true
+      })
+    }
+    else{
+      this.setState({
+        searchedBooks:"no Books found",
+        loadedSearch:false
+      })
+  }
   })
 }
+
 componentDidMount(){
   BooksAPI.getAll().then((response)=>{
     this.setState({
@@ -45,6 +65,7 @@ changeShelf = async (book,shelf)=>{
       books:response
     })
   })
+  this.getSearchedBooks(this.state.search);
 }
 
   render() {
@@ -54,7 +75,7 @@ changeShelf = async (book,shelf)=>{
           <Routes>
             <Route path="/" element={<Home books={this.state.books} changeShelf={this.changeShelf}/>}>
             </Route>
-            <Route path="/Search" element={<Search changeShelf={this.changeShelf} getSearchedBook={this.getSearchedBook} search={this.state.search} searchedBooks={this.state.searchedBooks}/>}>
+            <Route path="/Search" element={<Search changeShelf={this.changeShelf} getSearchedBook={this.getSearchedBook} search={this.state.search} searchedBooks={this.state.searchedBooks} loadedSearch={this.state.loadedSearch}/>}>
             </Route>
           </Routes>
         </div>
